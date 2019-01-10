@@ -1,0 +1,4 @@
+to do:
+domain, host controlla dove stanno. cambiali con os.environ[HOST]
+add allowed host in settings.py
+

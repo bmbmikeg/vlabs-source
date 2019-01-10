@@ -1,0 +1,113 @@
+{% extends "indextemplate.html" %}
+{% block custom-wrapper %}
+
+<h1>App: {{ bundle }}</h1>
+<h2>Services: {% for key, value in serviceenv.items %} {{ key }} {% endfor %}</h2>
+
+
+
+{% for key, value in serviceenv.items %}
+
+<div class="panel-body">
+                            <div class="table-responsive" style="width:100%">
+
+
+    <form action="/update/" name="form" method="POST" class="form-horizontal">
+
+          {% csrf_token %}
+          {{ form }}
+        <input name="service" type="hidden" value="{{ key }}" />
+        <input type="submit" value="Modifica Variabili" class="btn btn-primary"/>
+
+
+    </form>
+
+
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                        {{key}}
+                                        </th>
+                                    </tr>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for vv in value %}
+                                        {% cycle '<tr>'  '' %}
+                                        <td class="success">{{ vv.name }}</td>
+                                        <td class="success">{{ vv.value }}</td>
+                                        {% cycle  '</tr>' '' %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+
+
+{% endfor %}
+<p><a class="btn btn-danger" href="/del/?service={{ service }}">Delete App</a></p>
+
+
+{% endblock %}
+{% block footer_scripts %}
+    {{ block.super }}
+
+
+<script>
+function postdata(tenant)
+{
+                console.log(2222);
+
+    $.ajax({
+            "type": "POST",
+            "url": "/indexsvc/",
+            "data": {csrfmiddlewaretoken: "{{ csrf_token }}", "prj": tenant},
+            "success": function(result) {
+                console.log(1111);
+                location.href = '/indexsvc/'
+            },
+            "error": function(jqXHR, textStatus, errorThrown) {
+                console.log(3333);
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            },
+            "complete": function(result) {
+                console.log(4444);
+            },
+        });
+}
+
+function modvar(service)
+{
+                console.log(2222);
+                console.log(service);
+
+    $.ajax({
+            "type": "POST",
+            "url": "/update/",
+            "data": {csrfmiddlewaretoken: "{{ csrf_token }}", 'service': service},
+            "success": function(result) {
+                console.log(1111);
+                //###location.href = "/update/";
+            },
+            "error": function(jqXHR, textStatus, errorThrown) {
+                console.log(3333);
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            },
+            "complete": function(result) {
+                console.log(4444);
+            },
+        });
+}
+
+
+    </script>
+{% endblock %}

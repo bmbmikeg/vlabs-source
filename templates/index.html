@@ -1,0 +1,20 @@
+{% load bootstrap_themes %}
+{% bootstrap_styles theme='cerulean' type='css' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>V-LABS</title>
+</head>
+<body>
+
+{% load static %}
+<h1>V LABS</h1>
+<form action="/chns/" name="form" method="POST" class="form-horizontal">
+{% csrf_token %}
+{{ form.as_p }}
+     <input type="submit" value="Submit"/>
+</form>
+</body>
+</html>
