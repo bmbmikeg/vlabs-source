@@ -19,10 +19,10 @@ class Provision:
         self.k1 = kubernetes.client.CoreV1Api(kcfg)
         stream = file('vlabs_template.yml', 'r')
         ysrvc = yaml.load(stream)
-        if str(self.ysrvc['svcsdomain']).startswith('$'):
-            self.domain = os.environ('SVCSDOMAIN')
+        if str(ysrvc['svcsdomain']).startswith('$'):
+            self.domain = os.getenv('SVCSDOMAIN')
         else:
-            self.domain = self.ysrvc['svcsdomain']
+            self.domain = ysrvc['svcsdomain']
 
     def createsvc(self, deploy, port, imagename, namespace, envvar, nameapp, service, pvc, volumename, datadir):
         bservice = client.V1Service()

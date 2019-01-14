@@ -21,7 +21,7 @@ class Auth:
         stream = file('vlabs_template.yml', 'r')
         ysrvc = yaml.load(stream)
         if str(ysrvc['okdhost']).startswith('$'):
-            self.host = os.environ('OKDHOST')
+            self.host = os.getenv('OKDHOST')
         else:
             self.host = ysrvc['okdhost']
 

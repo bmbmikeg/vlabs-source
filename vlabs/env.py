@@ -11,7 +11,7 @@ class Var:
         self.stream = file('vlabs_template.yml', 'r')
         self.ysrvc = yaml.load(self.stream)
         if str(self.ysrvc['svcsdomain']).startswith('$'):
-            self.domain = os.environ('SVCSDOMAIN')
+            self.domain = os.getenv('SVCSDOMAIN')
         else:
             self.domain = self.ysrvc['svcsdomain']
         self.namespace = namespace
