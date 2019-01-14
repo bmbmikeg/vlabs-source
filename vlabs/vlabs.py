@@ -20,7 +20,10 @@ class Auth:
         self.pathcfg = self.cfg_file = '/root/.kube/' + str(sessionid) + '.config'
         stream = file('vlabs_template.yml', 'r')
         ysrvc = yaml.load(stream)
-        self.host = os.getenv('OKDHOST', ysrvc['okdhost'])
+        if str(ysrvc['okdhost']).startswith('$'):
+            self.host = os.environ('OKDHOST')
+        else:
+            self.host = ysrvc['okdhost']
 
     def login(self, user, pwd):
         ccrp = ['oc', 'login', self.host, '-u', str(user), '-p', str(pwd),

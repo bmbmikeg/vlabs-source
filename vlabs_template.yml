@@ -123,7 +123,7 @@ marketplace:
               - name: 'MONGO_URL'
                 value: 'mongodb://$service[mongo]:27017/rocketchat'
               - name: 'MAIL_URL'
-                value: 'smtp://smtp.roma2.infn.it'
+                value: $input
             volumes:
                 persistentvolumeclaim: 'yes'
                 datadir: '/data'

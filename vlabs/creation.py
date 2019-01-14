@@ -19,7 +19,10 @@ class Provision:
         self.k1 = kubernetes.client.CoreV1Api(kcfg)
         stream = file('vlabs_template.yml', 'r')
         ysrvc = yaml.load(stream)
-        self.domain = os.getenv('SVCSDOMAIN', str(ysrvc['svcsdomain']))
+        if str(self.ysrvc['svcsdomain']).startswith('$'):
+            self.domain = os.environ('SVCSDOMAIN')
+        else:
+            self.domain = self.ysrvc['svcsdomain']
 
     def createsvc(self, deploy, port, imagename, namespace, envvar, nameapp, service, pvc, volumename, datadir):
         bservice = client.V1Service()
@@ -158,7 +161,7 @@ class Provision:
         secureroute.termination = 'Edge'
         secureroute.insecure_edge_termination_policy = 'Redirect'
 
-        routespec.host = idname + '-' + str(l) + '.web.roma2.infn.it'
+        routespec.host = idname + '-' + str(l) + str(self.domain) ##'.web.roma2.infn.it'
         routespec.port = routeport
         routespec.to = routeto
         routespec.tls = secureroute

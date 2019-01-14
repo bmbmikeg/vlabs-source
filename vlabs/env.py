@@ -10,7 +10,10 @@ class Var:
     def __init__(self, namespace, user):
         self.stream = file('vlabs_template.yml', 'r')
         self.ysrvc = yaml.load(self.stream)
-        self.domain = os.getenv('SVCSDOMAIN', str(self.ysrvc['svcsdomain']))
+        if str(self.ysrvc['svcsdomain']).startswith('$'):
+            self.domain = os.environ('SVCSDOMAIN')
+        else:
+            self.domain = self.ysrvc['svcsdomain']
         self.namespace = namespace
         self.user = user
 
@@ -69,7 +72,7 @@ class Var:
                                     for portsarray in range(0, len(self.ysrvc['marketplace']['apps'][q]['services'][p]['ports'])):
                                         if self.ysrvc['marketplace']['apps'][q]['services'][p]['ports'][portsarray]['port'] == group[g][2].split(":")[1]:
                                             idname = str(app + "-" + self.ysrvc['marketplace']['apps'][q]['services'][p]['nameservice'])
-                                            repl = var[app][k][l].replace(str(group[g][0]), "https://" + idname + '-' + str(portsarray) + str(self.ysrvc['domain']))
+                                            repl = var[app][k][l].replace(str(group[g][0]), "https://" + idname + '-' + str(portsarray) + str(self.domain))
                                             var[app][k][l] = repl
                         if group[g][1] == '$variable':
                             rightvar = var[app][group[g][2].split(":")[0]][group[g][2].split(":")[1]]
