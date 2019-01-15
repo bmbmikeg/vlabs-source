@@ -8,8 +8,9 @@ import random
 
 class Var:
     def __init__(self, namespace, user):
-        self.stream = file('vlabs_template.yml', 'r')
-        self.ysrvc = yaml.load(self.stream)
+        path = os.path.dirname(__file__)
+        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        self.ysrvc = yaml.load(stream)
         if str(self.ysrvc['svcsdomain']).startswith('$'):
             self.domain = os.getenv('SVCSDOMAIN')
         else:

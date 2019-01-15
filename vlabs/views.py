@@ -401,7 +401,7 @@ def updatedvar(request):
     data = uptd.varupdate(newvars)
     getrun = SessionDict.buildSessionDict()[request.session.session_key]
     getrun.patchdcvar(service, request.session['project']['prj'], data)
-    return render(request, 'updatedvar.html')
+    return redirect("/indexsvc/")
 
 @userisadmin
 @userisauth

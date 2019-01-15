@@ -18,7 +18,8 @@ import os
 class Auth:
     def __init__(self, sessionid):
         self.pathcfg = self.cfg_file = '/root/.kube/' + str(sessionid) + '.config'
-        stream = file('vlabs_template.yml', 'r')
+        path = os.path.dirname(__file__)
+        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
         ysrvc = yaml.load(stream)
         if str(ysrvc['okdhost']).startswith('$'):
             self.host = os.getenv('OKDHOST')
@@ -53,8 +54,9 @@ class AppManager:
     def __init__(self, namespace, user=None):
         config_file = '/root/.kube/' + user + '.config'
         self.namespace = namespace
-        self.stream = file('vlabs_template.yml', 'r')
-        self.ysrvc = yaml.load(self.stream)
+        path = os.path.dirname(__file__)
+        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        self.ysrvc = yaml.load(stream)
         self.kcfg = kconf.new_client_from_config(config_file)
         self.ocfg = oconf.new_client_from_config(config_file)
 
@@ -325,8 +327,9 @@ class AppManager:
 
 class Config:
     def __init__(self):
-        self.stream = file('vlabs_template.yml', 'r')
-        self.ysrvc = yaml.load(self.stream)
+        path = os.path.dirname(__file__)
+        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        self.ysrvc = yaml.load(stream)
 
     def getready(self):
         pass

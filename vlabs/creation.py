@@ -17,7 +17,8 @@ class Provision:
         ocfg = oconf.new_client_from_config(cfg)
         self.o1 = openshift.client.OapiApi(ocfg)
         self.k1 = kubernetes.client.CoreV1Api(kcfg)
-        stream = file('vlabs_template.yml', 'r')
+        path = os.path.dirname(__file__)
+        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
         ysrvc = yaml.load(stream)
         if str(ysrvc['svcsdomain']).startswith('$'):
             self.domain = os.getenv('SVCSDOMAIN')
