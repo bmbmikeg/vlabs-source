@@ -38,7 +38,15 @@ def cprj(request):
         request.session['sessionid'] = request.session.session_key
         request.session['username'] = username
         prj = qauth.chooseprj()
-        SessionDict.buildSessionDict()[request.session.session_key] = True
+        if not prj:
+            getrun = AppManager(None, request.session.session_key)
+            if getrun.users():
+                admbtt = 1
+            else:
+                admbtt = 0 #####crea pagina di prima creazione namespace, anche sulla stessa pagina. alla classe admin serve solo la sessione dell'admin
+            print(prj)
+            print(admbtt)
+        #SessionDict.buildSessionDict()[request.session.session_key] = True
         return render(
             request,
             'chns.html', {'initialprj': prj, 'username': username})

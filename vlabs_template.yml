@@ -124,6 +124,7 @@ marketplace:
                 value: 'mongodb://$service[mongo]:27017/rocketchat'
               - name: 'MAIL_URL'
                 value: $input
+                description: 'mail url'
             volumes:
                 persistentvolumeclaim: 'yes'
                 datadir: '/data'

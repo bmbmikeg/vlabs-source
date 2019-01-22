@@ -245,6 +245,7 @@ class Adminclass:
         body.kind = 'Namespace'
         body.metadata = kubernetes.client.V1ObjectMeta()
         body.metadata.name = newns
+        body.metadata.annotations = {"openshift.io/display-name": newns}
         body.metadata.labels = {'namespace': 'v-labs'}
         try:
             api_response = api_instance.create_namespace(body, pretty='true')
@@ -252,4 +253,52 @@ class Adminclass:
             good = True
         except ApiException as e:
             print("Exception when calling CoreV1Api->create_namespace: %s\n" % e)
+        if good:
+            api_instance = openshift.client.AuthorizationOpenshiftIoV1Api(self.ocfg)
+            body = openshift.client.V1RoleBinding()  # V1alpha1RoleBinding |
+            body.kind = 'RoleBinding'
+            body.metadata = {'name':"system:deployers"}
+            body.role_ref = {'name':"system:deployer"}
+            body.subjects = []
+            body.subjects.append({})
+            body.subjects[0] = {"kind": "ServiceAccount", "name": "deployer", "namespace": newns}
+            string = "system:serviceaccount:" + newns + ":deployer"
+            body.user_names = []
+            body.user_names.append(string)
+
+            bodyb = openshift.client.V1RoleBinding()
+            bodyb.kind = 'RoleBinding'
+            bodyb.metadata = {'name': "system:image-builders"}
+            bodyb.role_ref = {'name': "system:image-builder"}
+            bodyb.subjects = []
+            bodyb.subjects.append({})
+            bodyb.subjects[0] = {"kind": "ServiceAccount", "name": "builder", "namespace": newns}
+            string = "system:serviceaccount:" + newns + ":builder"
+            bodyb.user_names = []
+            bodyb.user_names.append(string)
+
+            bodyc = openshift.client.V1RoleBinding()
+            bodyc.kind = 'RoleBinding'
+            bodyc.metadata = {'name': "system:image-pullers"}
+            bodyc.role_ref = {'name': "system:image-puller"}
+            bodyc.subjects = []
+            bodyc.subjects.append({})
+            string = "system:serviceaccounts:" + newns
+            bodyc.subjects[0] = {"kind": "SystemGroup", "name": string}
+
+            try:
+                api_response = api_instance.create_namespaced_role_binding(newns, body)
+                print(api_response)
+                api_response = api_instance.create_namespaced_role_binding(newns, bodyb)
+                print(api_response)
+                api_response = api_instance.create_namespaced_role_binding(newns, bodyc)
+                print(api_response)
+
+                #create empty user role binding
+                #user = openshift.client.V1RoleBinding()
+                #user.kind = "RoleBinding"
+                #api_response = api_instance.create_namespaced_role_binding(newns, user)
+                #print(api_response)
+            except ApiException as e:
+                print("Exception when calling RbacAuthorizationV1alpha1Api->create_namespaced_role_binding: %s\n" % e)
         return good

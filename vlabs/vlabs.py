@@ -40,8 +40,9 @@ class Auth:
     def chooseprj(self):
         self.ocfg = oconf.new_client_from_config(self.pathcfg)
         api_instance = openshift.client.OapiApi(self.ocfg)
+        selector = "namespace=v-labs"
         try:
-            list = api_instance.list_project(pretty='true')
+            list = api_instance.list_project(pretty='true') #, label_selector=selector)###V-LABS SELECTOR ON NAMESPACES
             prjs = []
             for i in range(0, len(list.items)):
                 prjs.append(list.items[i].metadata.name)
@@ -51,7 +52,7 @@ class Auth:
 
 
 class AppManager:
-    def __init__(self, namespace, user=None):
+    def __init__(self, namespace=None, user=None):
         config_file = '/root/.kube/' + user + '.config'
         self.namespace = namespace
         path = os.path.dirname(__file__)
