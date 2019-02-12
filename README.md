@@ -31,7 +31,7 @@ Openshift Origin with GlusterFS and Heketi,
 Docker.
 
 ### Docker Installation
-A V-labs Docker container is available on docker hub virtuallabs/vlabscontainer. [a link](https://hub.docker.com/r/virtuallabs/vlabscontainer)
+A V-labs Docker container is available on docker hub [virtuallabs/vlabscontainer](https://hub.docker.com/r/virtuallabs/vlabscontainer)
 
 ### Dockerfile
 If you want to build it by yourself use the dockerfile available in the repository.
