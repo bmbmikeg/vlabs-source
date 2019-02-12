@@ -6,22 +6,22 @@ The yaml defined marketplace describes the available services, every service can
 The actual marketplace comprehends learning management systems, Root and Geant4 VMs, CAD, videoconference services, statistical computing and programming languages environments, real-time collaboration and file storage and synchronization services, it can be also expanded with any container image built ad hoc by users or built and released by the Docker Hub community.
 V-Labs is written in Python and Django, binded to an existing installation of Openshift Origin with GlusterFS and the Heketi module, independent from the underlying infrastructure, it manages replicas and scalability of pods, replicated persistent volumes mounting and it will be released stand alone and as a docker container.
 
-### N.B.: V-Labs manages only "v-labs" tagged projects and services. So if you install it on a preexistent OKD instance, you'll not be able to manage your existing projects. This is a feature, in this way V-Labs is harmless to your environment.
-
+### N.B.: V-Labs manages only autocreated "v-labs" tagged projects and services. So if you install it on a preexistent OKD instance, you'll not be able to manage your existing projects. This is a feature, in this way V-Labs is harmless to your environment.
+### N.BB: Services routes are created by default using a wildcard domain (env SVCSDOMAIN). If you want to certify them you must use a wildcard certificate.
 
 ## Features
-No Limitations
-Opensource,
-Binded to an Openshift Origin installation with GlusterFS and Heketi,
-Independent from the underlying structure,
-Marketplace embedded: expandible with any private or public containerized service hosted by the Docker Hub Community,
-Every service is scalable, replicated and monitored,
-Quotas and persistent volumes for any service,
-One or more project areas for every admin.
+###No Limitations
+- Opensource,
+- Binded to an Openshift Origin installation with GlusterFS and Heketi,
+- Independent from the underlying structure,
+- Marketplace embedded: expandible with any private or public containerized service hosted by the Docker Hub Community,
+- Every service is scalable, replicated and monitored,
+- Quotas and persistent volumes for any service,
+- One or more project areas for every admin.
 
-No sensible data
-No database: Authn & Authz are managed by Openshift Origin,
-Simple Auth or Identity Providers (LDAP, SAML and others).
+###No sensible data
+- No database: Authn and Authz are managed by Openshift Origin,
+- Simple Auth or Identity Providers (LDAP, SAML and others).
 
 
 ## Tecnologies
@@ -38,17 +38,20 @@ If you want to build it by yourself use the dockerfile available in the reposito
 It uses PORT 8000 TCP.
 
 ### Environment Variables
+```
 OKDHOST = Openshift web address:port ex. ["openshift.myorg.com:8443"]
 SVCSDOMAIN = Wildcard domain of your services ex. [".wildcar.myorg.com"]
 VLROUTE = V-Labs web address, default "localhost"
+```
+```
 Optional Variables
 DJANGO_SECRET_KEY = A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
 DJANGO_DEBUG = Default False. Set to True to enable django debug mode.
 CSRF_COOKIE_SECURE = Default False. Whether to use a secure cookie for the CSRF cookie. If this is set to True, the cookie will be marked as “secure,” which means browsers may ensure that the cookie is only sent with an HTTPS connection.
 SESSION_COOKIE_SECURE = Default False. Whether to use a secure cookie for the session cookie. If this is set to True, the cookie will be marked as “secure,” which means browsers may ensure that the cookie is only sent under an HTTPS connection.
 SECURE_PROXY_SSL_H = Default False.  If True it tells Django to trust the X-Forwarded-Proto header that comes from our proxy, and any time its value is 'https', then the request is guaranteed to be secure (i.e., it originally came in via HTTPS). Equivalent of [SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') ]
-PYTHONWARNINGS= Default False. If you want ignore Unverified HTTPS request set to "ignore:Unverified HTTPS request"
-
+PYTHONWARNINGS = Default False. If you want ignore Unverified HTTPS request set to "ignore:Unverified HTTPS request"
+```
 
 ### Installation from Scratch
 
@@ -86,22 +89,22 @@ The yaml defined marketplace defines services and apps. Every app consists in on
 Example, fields description in brackets []:
 ```
 apps:
-      - name: 'moodle'			                                    [NAME OF THE APP]
+      - name: 'moodle'			                                            [NAME OF THE APP]
         services:
-          - nameservice: 'moodle'	                                [NAME OF THE FIRST SERVICE]
+          - nameservice: 'moodle'	                                 [NAME OF THE FIRST SERVICE]
             ports:
-              - port: 'moodle'		                                [PORT NAME]
-                tcp: 80 			                                [PORT NUMBER]
-                route: 'yes' 			                            [IF PORT CAN BE EXTERNAL ROUTED]
-            imagename: 'virtuallabs/moodlevlabs:1.34-1112018-2'     [DOCKER HUB IMAGE NAME]
-            env:                                                    [VARIABLES ARRAY - SEE DEDICATED PARAGRAPH]
+              - port: 'moodle'		                                    [PORT NAME]
+                tcp: 80 			                                          [PORT NUMBER]
+                route: 'yes' 			                                     [IF PORT CAN BE EXTERNAL ROUTED]
+            imagename: 'virtuallabs/moodlevlabs:1.34-1112018-2'   [DOCKER HUB IMAGE NAME]
+            env:                                                  [VARIABLES ARRAY - SEE DEDICATED PARAGRAPH]
               - name: 'DB_HOST'
                 ….
             volumes:
-                persistentvolumeclaim: 'yes'                        [IF A PV CAN BE MOUNTED]
-                datadir: '/var/www/moodledata'                      [PV MOUNT PATH]
+                persistentvolumeclaim: 'yes'                      [IF A PV CAN BE MOUNTED]
+                datadir: '/var/www/moodledata'                    [PV MOUNT PATH]
 
-          - nameservice: 'mysql' 		                            [SECOND SERVICE]
+          - nameservice: 'mysql' 		                                 [SECOND SERVICE]
             ports:
 	[...]
 ```
