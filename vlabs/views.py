@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpRequest
 from vlabs import Config, AppManager, Auth
 from django.shortcuts import render, redirect
 from forms import VlabsForm
-from pprint import pprint
+#from pprint import pprint
 from env import Var
 from decorators import userisauth, userisadmin
 from models import ServiceView, UpdateServices
@@ -25,7 +25,7 @@ def index(request):
         request,
         'index.html', {'form': f})
 
-def cprj(request):
+def authnauthz(request):
     user = request.POST.dict()
     username = user['username']
     pwd = user['password']
@@ -37,19 +37,50 @@ def cprj(request):
     if check == 0:
         request.session['sessionid'] = request.session.session_key
         request.session['username'] = username
+        return redirect("/chns/")
+    else:
+        return redirect("/")
+
+@userisauth
+def chns(request):
+    form = False
+    qauth = Auth(request.session.session_key)
+    prj = qauth.chooseprj()
+    if not prj:
+        getrun = AppManager(None, request.session.session_key)
+        if getrun.users():
+            form = VlabsForm()
+            form.createns()
+        else:
+            form = False
+    return render(
+        request,
+        'chns.html', {'initialprj': prj, 'username': request.session['username'], 'form': form})
+
+def cprj(request):
+    user = request.POST.dict()
+    username = user['username']
+    pwd = user['password']
+    if not request.session.session_key:
+        request.session.save()
+    session = request.session.session_key
+    qauth = Auth(session)
+    check = qauth.login(username, pwd)
+    form = False
+    if check == 0:
+        request.session['sessionid'] = request.session.session_key
+        request.session['username'] = username
         prj = qauth.chooseprj()
         if not prj:
             getrun = AppManager(None, request.session.session_key)
             if getrun.users():
-                admbtt = 1
+                form = VlabsForm()
+                form.createns()
             else:
-                admbtt = 0 #####crea pagina di prima creazione namespace, anche sulla stessa pagina. alla classe admin serve solo la sessione dell'admin
-            print(prj)
-            print(admbtt)
-        #SessionDict.buildSessionDict()[request.session.session_key] = True
+                form = False #####crea pagina di prima creazione namespace, anche sulla stessa pagina. alla classe admin serve solo la sessione dell'admin
         return render(
             request,
-            'chns.html', {'initialprj': prj, 'username': username})
+            'chns.html', {'initialprj': prj, 'username': username, 'form': form})
     else:
         request.session.flush()
         return redirect('index')
@@ -110,7 +141,7 @@ def svcupdate(request):
         donutupdate = serviceview.dchart(dictbundle)
         return HttpResponse(content=json.dumps(donutupdate))
     else:
-        print ("ERROR")
+        logging.warning ("request not ajax - ERROR")
 
 
 @userisauth
@@ -164,16 +195,17 @@ def funcns(request):
     #users list
     usrschart = serviceview.userschart(users)
     nssvcs = adminclass.readnsdc(namespace)
-    pprint(nssvcs) ###last status Check!
+    #pprint(nssvcs) ###last status Check!
     quotas = adminclass.readquotas(namespace).items
     lmts = adminclass.readlimits(namespace)
     limits = serviceview.limitsformat(lmts)
+    nodescheck = adminclass.listnodes()
     fql = VlabsForm()
     fql.setlimits(namespace)
     return render(
         request,
         'namespace.html',
-        context={'namespace': namespace, 'prj': prj, 'usrschart': usrschart, 'nssvcs': nssvcs, 'quotas': quotas, 'limits': limits, 'formlim':fql, 'nsusers': nsusers})
+        context={'namespace': namespace, 'prj': prj, 'nodescheck': nodescheck ,'usrschart': usrschart, 'nssvcs': nssvcs, 'quotas': quotas, 'limits': limits, 'formlim':fql, 'nsusers': nsusers})
 
 
 @userisauth
@@ -292,13 +324,17 @@ def newns(request):
         'newns.html',
         context={'prj': prj, 'usrschart': usrschart, 'nodescheck': nodescheck, 'form': form})
 
+@userisauth
 def nscreated(request):
     adminclass = Adminclass(request.session.session_key)
     if request.POST:
         dict = request.POST.dict()
         newns = dict['namespacename']
-        if adminclass.createns(newns):
-            return redirect("/adminsvcs/")
+        if adminclass.createns(newns, request.session['username']):
+            if 'first' in dict:
+                return redirect("/chns/")
+            else:
+                return redirect("/adminsvcs/")
         else:
             return redirect("/newns/")
 
@@ -386,7 +422,7 @@ def logout(request):
     rmauthz.logout()
     request.session.flush()
     SessionDict.ssd = {}
-    return render(request, 'logout.html')
+    return redirect("/")
 
 @userisauth
 def updatevar(request):

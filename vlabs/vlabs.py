@@ -6,12 +6,10 @@ import openshift.client
 import openshift.config as oconf
 from creation import Provision
 from deletion import Del
-from volumes import Vol
 from openshift.client.models import V1DeploymentConfigList, V1DeploymentConfig, V1Route
 from openshift.client.models.v1_route_list import V1RouteList
 import subprocess
-import shlex
-from pprint import pprint
+import logging
 import os
 
 
@@ -19,7 +17,7 @@ class Auth:
     def __init__(self, sessionid):
         self.pathcfg = self.cfg_file = '/root/.kube/' + str(sessionid) + '.config'
         path = os.path.dirname(__file__)
-        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        stream = file((os.path.join(path, '../marketplace/vlabs_template.yml')), 'r')
         ysrvc = yaml.load(stream)
         if str(ysrvc['okdhost']).startswith('$'):
             self.host = os.getenv('OKDHOST')
@@ -42,7 +40,7 @@ class Auth:
         api_instance = openshift.client.OapiApi(self.ocfg)
         selector = "namespace=v-labs"
         try:
-            list = api_instance.list_project(pretty='true') #, label_selector=selector)###V-LABS SELECTOR ON NAMESPACES
+            list = api_instance.list_project(pretty='true', label_selector=selector)###V-LABS SELECTOR ON NAMESPACES
             prjs = []
             for i in range(0, len(list.items)):
                 prjs.append(list.items[i].metadata.name)
@@ -56,8 +54,17 @@ class AppManager:
         config_file = '/root/.kube/' + user + '.config'
         self.namespace = namespace
         path = os.path.dirname(__file__)
-        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        stream = file((os.path.join(path, '../marketplace/vlabs_template.yml')), 'r')
         self.ysrvc = yaml.load(stream)
+        custompath = os.path.join(path, "../marketplace/custom_marketplace/")
+        for f in sorted(os.listdir(custompath)):
+            if f.endswith(".yml"):
+                stream2 = file((os.path.join(custompath, f)), 'r')
+                ysrvc2 = yaml.load(stream2)
+                for i in ysrvc2:
+                    self.ysrvc['marketplace']['apps'].append(i)
+            else:
+                pass
         self.kcfg = kconf.new_client_from_config(config_file)
         self.ocfg = oconf.new_client_from_config(config_file)
 
@@ -283,9 +290,6 @@ class AppManager:
         try:
             api_response = api_instance.read_namespaced_deployment_config_status(name, self.namespace, pretty='true')
             cond = api_response.status.conditions
-            print("COOOOOOOOOOOOOONDIIIIIIIIIIIIIIITIOOOOOOOOOOOOOOOOOOOOOOON")
-            print(cond)
-            print("endCOOOOOOOOOOOOOONDIIIIIIIIIIIIIIITIOOOOOOOOOOOOOOOOOOOOOOON")
             if cond[0].last_transition_time > cond[1].last_transition_time:
                 activecond = cond[0]
             else:
@@ -322,15 +326,24 @@ class AppManager:
         api_instance = openshift.client.OapiApi(self.ocfg)
         try:
             api_response = api_instance.patch_namespaced_deployment_config(name, namespace, body, pretty='true')
-            pprint(api_response)
+            logging.info(api_response)
         except ApiException as e:
             print("Exception when calling OapiApi->patch_namespaced_deployment_config: %s\n" % e)
 
 class Config:
     def __init__(self):
         path = os.path.dirname(__file__)
-        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        stream = file((os.path.join(path, '../marketplace/vlabs_template.yml')), 'r')
         self.ysrvc = yaml.load(stream)
+        custompath = os.path.join(path, "../marketplace/custom_marketplace/")
+        for f in sorted(os.listdir(custompath)):
+            if f.endswith(".yml"):
+                stream2 = file((os.path.join(custompath, f)), 'r')
+                ysrvc2 = yaml.load(stream2)
+                for i in ysrvc2:
+                    self.ysrvc['marketplace']['apps'].append(i)
+            else:
+                pass
 
     def getready(self):
         pass
@@ -347,9 +360,9 @@ class Config:
     def appinfo(self, app):
         try:
             app_index = next(index for (index, d) in enumerate(self.ysrvc['marketplace']['apps']) if d["name"] == app)
-            print(self.ysrvc['marketplace']['apps'][app_index])
+            logging.info(self.ysrvc['marketplace']['apps'][app_index])
         except:
-            print("app non esistente")
+            logging.warning("app not found")
 
     def getports(self, app): # used only for debug
         try:
@@ -359,7 +372,7 @@ class Config:
                 print(self.ysrvc['marketplace']['apps'][app_index]['services'][j]['ports'])
                 print("\n")
         except:
-            print("app non esistente")
+            logging.warning("app not found")
 
     def getenv(self, index):
         varuser = []

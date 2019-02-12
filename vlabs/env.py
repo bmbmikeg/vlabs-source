@@ -9,7 +9,7 @@ import random
 class Var:
     def __init__(self, namespace, user):
         path = os.path.dirname(__file__)
-        stream = file((os.path.join(path, '../vlabs_template.yml')), 'r')
+        stream = file((os.path.join(path, '../marketplace/vlabs_template.yml')), 'r')
         self.ysrvc = yaml.load(stream)
         if str(self.ysrvc['svcsdomain']).startswith('$'):
             self.domain = os.getenv('SVCSDOMAIN')
@@ -17,6 +17,16 @@ class Var:
             self.domain = self.ysrvc['svcsdomain']
         self.namespace = namespace
         self.user = user
+        custompath = os.path.join(path, "../marketplace/custom_marketplace/")
+        for f in sorted(os.listdir(custompath)):
+            if f.endswith(".yml"):
+                stream2 = file((os.path.join(custompath, f)), 'r')
+                ysrvc2 = yaml.load(stream2)
+                for i in ysrvc2:
+                    self.ysrvc['marketplace']['apps'].append(i)
+            else:
+                pass
+
 
     def randompassword(self, pwdlen):
         password_charset = string.ascii_letters + string.digits
@@ -79,7 +89,7 @@ class Var:
                             rightvar = var[app][group[g][2].split(":")[0]][group[g][2].split(":")[1]]
                             repl = var[app][k][l].replace(group[g][0], rightvar)
                             var[app][k][l] = repl
-            print(var[app][k])
+            #print(var[app][k])
 
         self.create(q, app, var, volspace, pvc)
 

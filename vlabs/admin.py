@@ -3,6 +3,7 @@ import kubernetes.client
 from kubernetes.client.rest import ApiException
 import openshift.client
 import openshift.config as oconf
+import logging
 
 ###controlla field selector e label selector
 class Adminclass:
@@ -39,7 +40,7 @@ class Adminclass:
         try:
             api_response = api_instance.delete_namespace(namespace, body, grace_period_seconds=grace_period_seconds,
                                                          propagation_policy=propagation_policy)
-            print(api_response)
+            logging.info(api_response)
         except ApiException as e:
             print("Exception when calling CoreV1Api->delete_namespace: %s\n" % e)
 
@@ -49,7 +50,7 @@ class Adminclass:
 
         try:
             api_response = api_instance.list_namespaced_resource_quota(namespace, timeout_seconds=timeout_seconds)
-            print(api_response)
+            logging.info(api_response)
             return api_response
         except ApiException as e:
             print("Exception when calling CoreV1Api->list_namespaced_resource_quota: %s\n" % e)
@@ -82,7 +83,7 @@ class Adminclass:
         timeout_seconds = 56
         try:
             api_response = api_instance.list_namespaced_limit_range(namespace, timeout_seconds=timeout_seconds)
-            print(api_response)
+            logging.info(api_response)
             return api_response.items
         except ApiException as e:
             print("Exception when calling CoreV1Api->list_namespaced_limit_range: %s\n" % e)
@@ -123,7 +124,7 @@ class Adminclass:
 
         try:
             api_response = api_instance.patch_namespaced_limit_range(name, namespace, body)
-            print(api_response)
+            logging.info(api_response)
         except ApiException as e:
             print("Exception when calling CoreV1Api->patch_namespaced_limit_range: %s\n" % e)
 
@@ -131,7 +132,7 @@ class Adminclass:
         api_instance = kubernetes.client.CoreV1Api(self.kcfg)
         try:
             api_response = api_instance.read_namespaced_limit_range(name, namespace)
-            print(api_response)
+            logging.info(api_response)
             return api_response
         except ApiException as e:
             print("Exception when calling CoreV1Api->read_namespaced_limit_range: %s\n" % e)
@@ -141,7 +142,7 @@ class Adminclass:
 
         try:
             api_response = api_instance.read_namespaced_resource_quota(name, namespace)
-            print(api_response)
+            logging.info(api_response)
             return(api_response)
         except ApiException as e:
             print("Exception when calling CoreV1Api->read_namespaced_resource_quota: %s\n" % e)
@@ -150,7 +151,7 @@ class Adminclass:
         api_instance = kubernetes.client.CoreV1Api(self.kcfg)
         try:
             api_response = api_instance.create_namespaced_resource_quota(namespace, body)
-            print(api_response)
+            logging.info(api_response)
             return api_response
         except ApiException as e:
             print("Exception when calling CoreV1Api->create_namespaced_resource_quota: %s\n" % e)
@@ -160,7 +161,7 @@ class Adminclass:
 
         try:
             api_response = api_instance.patch_namespaced_deployment_config(name, namespace, body)
-            print(api_response)
+            logging.info(api_response)
             return api_response
         except ApiException as e:
             print("Exception when calling AppsOpenshiftIoV1Api->patch_namespaced_deployment_config: %s\n" % e)
@@ -219,7 +220,7 @@ class Adminclass:
 
         try:
             api_response = api_instance.read_namespaced_role_binding(name, namespace)
-            print(api_response)
+            logging.info(api_response)
         except ApiException as e:
             print("Exception when calling AuthorizationOpenshiftIoV1Api->list_namespaced_role_binding: %s\n" % e)
 
@@ -234,11 +235,11 @@ class Adminclass:
             body.user_names.remove(user)
         try:
             api_response = api_instance.replace_namespaced_role_binding(name, namespace, body)
-            print(api_response)
+            logging.info(api_response)
         except ApiException as e:
             print("Exception when calling AuthorizationOpenshiftIoV1Api->replace_namespaced_role_binding: %s\n" % e)
 
-    def createns(self, newns):
+    def createns(self, newns, username):
         good = False
         api_instance = kubernetes.client.CoreV1Api(self.kcfg)
         body = kubernetes.client.V1Namespace()
@@ -249,7 +250,7 @@ class Adminclass:
         body.metadata.labels = {'namespace': 'v-labs'}
         try:
             api_response = api_instance.create_namespace(body, pretty='true')
-            print(api_response)
+            logging.info(api_response)
             good = True
         except ApiException as e:
             print("Exception when calling CoreV1Api->create_namespace: %s\n" % e)
@@ -286,13 +287,24 @@ class Adminclass:
             string = "system:serviceaccounts:" + newns
             bodyc.subjects[0] = {"kind": "SystemGroup", "name": string}
 
+            adminrole = openshift.client.V1RoleBinding()
+            adminrole.kind = 'RoleBinding'
+            adminrole.metadata = {'name': "admin"}
+            adminrole.role_ref = {'name': "admin"}
+            adminrole.subjects = []
+            adminrole.subjects.append({'kind': 'User', 'name': username})
+            adminrole.user_names = []
+            adminrole.user_names.append(username)
+
             try:
                 api_response = api_instance.create_namespaced_role_binding(newns, body)
-                print(api_response)
+                logging.info(api_response)
                 api_response = api_instance.create_namespaced_role_binding(newns, bodyb)
-                print(api_response)
+                logging.info(api_response)
                 api_response = api_instance.create_namespaced_role_binding(newns, bodyc)
-                print(api_response)
+                logging.info(api_response)
+                api_response = api_instance.create_namespaced_role_binding(newns, adminrole)
+                logging.info(api_response)
 
                 #create empty user role binding
                 #user = openshift.client.V1RoleBinding()

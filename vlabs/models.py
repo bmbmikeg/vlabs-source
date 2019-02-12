@@ -19,7 +19,7 @@ class ServiceView:
             chart['colors'] = []
             svcnum = 0
             for kk in dictbundle[k].keys():
-                print(dictbundle)
+                #print(dictbundle)
                 status = dictbundle[k][kk]['status']
                 chart['data'].append({})
                 chart['data'][svcnum]['label'] = kk
@@ -38,7 +38,7 @@ class ServiceView:
         arprj = []
         i = 0
         for k in dictprj:
-            arprj.append({'y':k, 'a':len(dictprj[k])})
+            arprj.append({'y': k, 'a': len(dictprj[k])})
         return arprj
 
     def userschart(self, usersdict):
