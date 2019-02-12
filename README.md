@@ -10,7 +10,7 @@ V-Labs is written in Python and Django, binded to an existing installation of Op
 ### N.BB: Services routes are created by default using a wildcard domain (env SVCSDOMAIN). If you want to certify them you must use a wildcard certificate.
 
 ## Features
-###No Limitations
+### No Limitations
 - Opensource,
 - Binded to an Openshift Origin installation with GlusterFS and Heketi,
 - Independent from the underlying structure,
@@ -19,7 +19,7 @@ V-Labs is written in Python and Django, binded to an existing installation of Op
 - Quotas and persistent volumes for any service,
 - One or more project areas for every admin.
 
-###No sensible data
+### No sensible data
 - No database: Authn and Authz are managed by Openshift Origin,
 - Simple Auth or Identity Providers (LDAP, SAML and others).
 
