@@ -86,22 +86,22 @@ The yaml defined marketplace defines services and apps. Every app consists in on
 Example, fields description in brackets []:
 ```
 apps:
-      - name: 'moodle'			 [NAME OF THE APP]
+      - name: 'moodle'			                                    [NAME OF THE APP]
         services:
-          - nameservice: 'moodle'	 [NAME OF THE FIRST SERVICE]
+          - nameservice: 'moodle'	                                [NAME OF THE FIRST SERVICE]
             ports:
-              - port: 'moodle'		 [PORT NAME]
-                tcp: 80 			 [PORT NUMBER]
-                route: 'yes' 			 [IF PORT CAN BE EXTERNAL ROUTED]
+              - port: 'moodle'		                                [PORT NAME]
+                tcp: 80 			                                [PORT NUMBER]
+                route: 'yes' 			                            [IF PORT CAN BE EXTERNAL ROUTED]
             imagename: 'virtuallabs/moodlevlabs:1.34-1112018-2'     [DOCKER HUB IMAGE NAME]
-            env: [VARIABLES ARRAY - SEE DEDICATED PARAGRAPH]
+            env:                                                    [VARIABLES ARRAY - SEE DEDICATED PARAGRAPH]
               - name: 'DB_HOST'
                 ….
             volumes:
-                persistentvolumeclaim: 'yes'       [IF A PV CAN BE MOUNTED]
-                datadir: '/var/www/moodledata'  [PV MOUNT PATH]
+                persistentvolumeclaim: 'yes'                        [IF A PV CAN BE MOUNTED]
+                datadir: '/var/www/moodledata'                      [PV MOUNT PATH]
 
-          - nameservice: 'mysql' 		[SECOND SERVICE]
+          - nameservice: 'mysql' 		                            [SECOND SERVICE]
             ports:
 	[...]
 ```
@@ -114,9 +114,9 @@ description: it's the resulting description in v-labs web page
 value: it's the variable type and value, it can be:
 ```
 
-	$input: if the value has to be specified V-Labs web page
-	$random: if the value has to be a random string
-	$service[service name]: if the value is the name of a service in the same app
+$input: if the value has to be specified V-Labs web page
+$random: if the value has to be a random string
+$service[service name]: if the value is the name of a service in the same app
 $variable[service name:name of the variable]: if the value must be the same of another service environment variable in the same app
 $route[service name:port name]: if the value is the route to a specific port of a service (in the same app)
 ```
