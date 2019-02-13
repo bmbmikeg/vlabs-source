@@ -9,7 +9,7 @@ marketplace:
               - port: 'moodle'
                 tcp: 80
                 route: 'yes'
-            imagename: 'virtuallabs/moodlevlabs:1.34-1112018-2'
+            imagename: 'virtuallabs/moodlevlabs:1.35-1'
             env:
               - name: 'DB_HOST'
                 value: $service[mysql]
