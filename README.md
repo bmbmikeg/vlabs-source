@@ -75,6 +75,7 @@ django-static-jquery
 PyYAML
 kubernetes=='3.0.0'
 openshift=='0.3.4'
+WhiteNoise
 ```
 
 
